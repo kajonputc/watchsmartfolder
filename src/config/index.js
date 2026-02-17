@@ -2,9 +2,9 @@ const path = require('path');
 
 module.exports = {
     paths: {
-        input: process.env.INPUT_DIR || 'C:/VideoData/Input',
-        output: process.env.OUTPUT_DIR || 'C:/VideoData/Output',
-        archive: process.env.ARCHIVE_DIR || 'Z:/Archive', // Mapped Network Drive
+        input: process.env.INPUT_DIR || 'Z:/ntorrent/Input',
+        output: process.env.OUTPUT_DIR || 'Z:/ntorrent/Output',
+        archive: process.env.ARCHIVE_DIR || 'Z:/ntorrent/Archive', // Mapped Network Drive
         db: path.join(__dirname, '../../data/database.sqlite'),
     },
     video: {
