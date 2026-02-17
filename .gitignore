@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+package-lock.json
+
+# Environment Variables
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Database (Local SQLITE)
+data/*.sqlite
+data/*.db
+data/legacy.txt
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Build Artifacts
+dist
+build
