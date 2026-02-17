@@ -10,10 +10,8 @@ logs
 *.log
 npm-debug.log*
 
-# Database (Local SQLITE)
-data/*.sqlite
-data/*.db
-data/legacy.txt
+# Database & Data
+data/
 
 # OS Files
 .DS_Store

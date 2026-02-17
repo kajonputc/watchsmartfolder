@@ -153,3 +153,32 @@ To run this project, the host machine **MUST** have:
   ```bash
   npm run import-legacy
   ```
+
+---
+
+## 8. Git & GitHub Setup
+
+### Initial Setup (Already done)
+We have initialized a local git repository and created a `.gitignore` file to exclude `node_modules`, `logs`, and local databases.
+
+### Connect to GitHub
+1.  **Create a New Repository** on GitHub (Start a project).
+2.  **Copy the Repository URL** (e.g., `https://github.com/USERNAME/REPO-NAME.git`).
+3.  **Run the following commands** in your terminal (inside the project folder):
+
+```bash
+# Add the remote repository
+git remote add origin <YOUR_GITHUB_REPO_URL>
+
+# Push the code to the main branch
+git branch -M main
+git push -u origin main
+```
+
+### Future Updates
+When you make changes to the code:
+```bash
+git add .
+git commit -m "Description of changes"
+git push
+```

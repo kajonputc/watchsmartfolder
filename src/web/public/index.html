@@ -68,6 +68,20 @@ VDO-003"></textarea>
             <section class="card recent-activity">
                 <div class="card-header">
                     <h2>Current Queue</h2>
+
+                    <div class="queue-controls" style="display:flex; gap:10px; align-items:center;">
+                        <input type="text" id="queue-search" placeholder="Search..."
+                            style="padding: 6px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+                        <select id="queue-status"
+                            style="padding: 6px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="completed">Completed</option>
+                            <option value="failed">Failed</option>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+
                     <div class="pagination-controls">
                         <select id="rows-per-page">
                             <option value="50">50 / page</option>
@@ -85,10 +99,19 @@ VDO-003"></textarea>
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Category (ID)</th>
-                                <th>Status</th>
-                                <th>Time Added</th>
+                                <th class="sortable" data-sort="original_name">Name <span class="sort-indic"></span>
+                                </th>
+                                <th class="sortable" data-sort="cleaned_name">Category <span class="sort-indic"></span>
+                                </th>
+                                <th class="sortable" data-sort="file_size">Size <span class="sort-indic"></span></th>
+                                <th class="sortable" data-sort="duration_sec">Duration <span class="sort-indic"></span>
+                                </th>
+                                <th class="sortable" data-sort="resolution">Res <span class="sort-indic"></span></th>
+                                <th class="sortable" data-sort="video_encoder">Codec <span class="sort-indic"></span>
+                                </th>
+                                <th class="sortable" data-sort="video_status">Status <span class="sort-indic"></span>
+                                </th>
+                                <th class="sortable" data-sort="created_at">Added <span class="sort-indic">↓</span></th>
                             </tr>
                         </thead>
                         <tbody id="queue-list">

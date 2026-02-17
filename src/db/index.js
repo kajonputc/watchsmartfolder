@@ -30,6 +30,12 @@ class Database {
         video_status TEXT DEFAULT 'pending', -- pending, processing, completed, failed, skipped
         subtitle_status TEXT DEFAULT 'pending', -- pending, extracted, failed
         is_legacy BOOLEAN DEFAULT 0,
+        file_size INTEGER,
+        duration_sec INTEGER,
+        resolution TEXT,
+        video_encoder TEXT,
+        has_subtitle BOOLEAN DEFAULT 0,
+        subtitle_formats TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
@@ -69,8 +75,14 @@ class Database {
 
   addFile(file) {
     const stmt = this.db.prepare(`
-      INSERT INTO files_registry (original_name, cleaned_name, file_hash, is_legacy)
-      VALUES (@original_name, @cleaned_name, @file_hash, @is_legacy)
+      INSERT INTO files_registry (
+        original_name, cleaned_name, file_hash, is_legacy, 
+        file_size, duration_sec, resolution, video_encoder, has_subtitle, subtitle_formats
+      )
+      VALUES (
+        @original_name, @cleaned_name, @file_hash, @is_legacy,
+        @file_size, @duration_sec, @resolution, @video_encoder, @has_subtitle, @subtitle_formats
+      )
     `);
     return stmt.run(file);
   }
@@ -98,7 +110,56 @@ class Database {
   }
 
   getPendingCount() {
+    // Keep internal use or legacy
     const result = this.db.prepare("SELECT COUNT(*) as count FROM files_registry WHERE video_status = 'pending' OR subtitle_status = 'pending'").get();
+    return result.count;
+  }
+
+  getFiles({ limit = 50, offset = 0, sortBy = 'created_at', sortOrder = 'DESC', status = null, search = null }) {
+    let query = "SELECT * FROM files_registry WHERE 1=1";
+    const params = [];
+
+    if (status && status !== 'all') {
+      query += " AND video_status = ?";
+      params.push(status);
+    }
+
+    if (search) {
+      query += " AND (original_name LIKE ? OR cleaned_name LIKE ?)";
+      params.push(`%${search}%`);
+      params.push(`%${search}%`);
+    }
+
+    // Validate Sort Column
+    const allowedSorts = ['original_name', 'cleaned_name', 'video_status', 'created_at', 'file_size', 'duration_sec', 'resolution', 'video_encoder'];
+    if (!allowedSorts.includes(sortBy)) sortBy = 'created_at';
+
+    // Validate Sort Order
+    const order = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    query += ` ORDER BY ${sortBy} ${order}`;
+    query += " LIMIT ? OFFSET ?";
+    params.push(limit, offset);
+
+    return this.db.prepare(query).all(...params);
+  }
+
+  getFilesCount({ status = null, search = null }) {
+    let query = "SELECT COUNT(*) as count FROM files_registry WHERE 1=1";
+    const params = [];
+
+    if (status && status !== 'all') {
+      query += " AND video_status = ?";
+      params.push(status);
+    }
+
+    if (search) {
+      query += " AND (original_name LIKE ? OR cleaned_name LIKE ?)";
+      params.push(`%${search}%`);
+      params.push(`%${search}%`);
+    }
+
+    const result = this.db.prepare(query).get(...params);
     return result.count;
   }
 }

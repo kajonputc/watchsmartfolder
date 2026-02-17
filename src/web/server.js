@@ -25,11 +25,24 @@ class WebServer {
                 const limit = parseInt(req.query.limit) || 50;
                 const offset = (page - 1) * limit;
 
-                const pending = this.db.getPendingFiles(limit, offset);
-                const total = this.db.getPendingCount();
+                const sortBy = req.query.sortBy || 'created_at';
+                const sortOrder = req.query.sortOrder || 'DESC';
+                const status = req.query.status || 'pending'; // Default to pending to match "Current Queue" behavior
+                const search = req.query.search || null;
+
+                // If status is 'all', pass null to db
+                const dbStatus = status === 'all' ? null : status;
+
+                const pending = this.db.getFiles({
+                    limit, offset, sortBy, sortOrder, status: dbStatus, search
+                });
+
+                const total = this.db.getFilesCount({
+                    status: dbStatus, search
+                });
 
                 res.json({
-                    pending,
+                    pending, // Rename to 'files' in future? Keeping 'pending' for frontend compatibility for now
                     total,
                     page,
                     limit,
@@ -114,7 +127,15 @@ class WebServer {
                     // Search in DB
                     // Search for Cleaned Name starting with the term
                     // If searchTerm is FNS-075, we find FNS-075.mp4
-                    const result = stmt.get(`${searchTerm}%`);
+                    let result = stmt.get(`${searchTerm}%`);
+
+                    if (!result) {
+                        const noHyphenMatch = searchTerm.match(/^([A-Z]+)(\d+)$/);
+                        if (noHyphenMatch) {
+                            const alternateTerm = `${noHyphenMatch[1]}-${noHyphenMatch[2]}`;
+                            result = stmt.get(`${alternateTerm}%`);
+                        }
+                    }
 
                     if (result) {
                         found.push({ term: term, matches: result.cleaned_name, data: result });
